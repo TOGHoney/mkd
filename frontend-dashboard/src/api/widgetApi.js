@@ -1,4 +1,4 @@
-import client from './client.js';
+import client, { getStoredToken } from './client.js';
 
 export const DEMO_CONVERSATIONS = [
   {
@@ -150,16 +150,20 @@ export async function fetchConversations(workspaceId, { page = 1, limit = 20, se
     });
     return res?.conversations || [];
   } catch (err) {
-    console.warn('[widgetApi] Fallback to demo conversations:', err.message);
-    let filtered = DEMO_CONVERSATIONS;
-    if (search) {
-      const q = search.toLowerCase();
-      filtered = filtered.filter(c =>
-        c.messages.some(m => m.content.toLowerCase().includes(q)) ||
-        c.origin.toLowerCase().includes(q)
-      );
+    const token = getStoredToken();
+    if (token === 'demo_token_supermemory_2026') {
+      let filtered = DEMO_CONVERSATIONS;
+      if (search) {
+        const q = search.toLowerCase();
+        filtered = filtered.filter(c =>
+          c.messages.some(m => m.content.toLowerCase().includes(q)) ||
+          c.origin.toLowerCase().includes(q)
+        );
+      }
+      return filtered;
     }
-    return filtered;
+    console.warn('[widgetApi] Error fetching conversations:', err.message);
+    return [];
   }
 }
 

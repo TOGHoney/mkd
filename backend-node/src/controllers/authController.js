@@ -59,6 +59,7 @@ async function register(req, res) {
       },
       workspace: {
         id: workspace._id,
+        _id: workspace._id,
         name: workspace.name,
         widget_key: workspace.widget_key,
         api_key: workspace.api_key,
@@ -115,6 +116,7 @@ async function login(req, res) {
       },
       workspace: {
         id: workspace._id,
+        _id: workspace._id,
         name: workspace.name,
         widget_key: workspace.widget_key,
         api_key: workspace.api_key,

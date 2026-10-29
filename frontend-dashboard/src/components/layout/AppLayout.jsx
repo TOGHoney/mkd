@@ -52,7 +52,10 @@ export function AppLayout({
 
         <main className="flex-1 p-8 overflow-y-auto">
           {currentTab === 'overview' && (
-            <WorkspaceOverview onOpenEmbedModal={() => setEmbedModalOpen(true)} />
+            <WorkspaceOverview
+              onOpenEmbedModal={() => setEmbedModalOpen(true)}
+              onSelectTab={setCurrentTab}
+            />
           )}
 
           {currentTab === 'sources' && (

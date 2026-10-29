@@ -59,8 +59,9 @@ export function AuthProvider({ children }) {
       setStoredToken(res.token);
       setToken(res.token);
       setUser(res.user);
-      if (res.workspace?._id) {
-        setStoredWorkspaceId(res.workspace._id);
+      const wsId = res.workspace?._id || res.workspace?.id;
+      if (wsId) {
+        setStoredWorkspaceId(wsId);
       }
       return res;
     } catch (err) {
@@ -85,8 +86,9 @@ export function AuthProvider({ children }) {
       setStoredToken(res.token);
       setToken(res.token);
       setUser(res.user);
-      if (res.workspace?._id) {
-        setStoredWorkspaceId(res.workspace._id);
+      const wsId = res.workspace?._id || res.workspace?.id;
+      if (wsId) {
+        setStoredWorkspaceId(wsId);
       }
       return res;
     } catch (err) {

@@ -1,4 +1,4 @@
-import client from './client.js';
+import client, { getStoredToken } from './client.js';
 
 // Default mock sources for offline / demo mode
 export const DEMO_SOURCES = [
@@ -80,8 +80,12 @@ export async function fetchSources() {
     const res = await client.get('/sources');
     return res?.sources || [];
   } catch (err) {
-    console.warn('[sourcesApi] Fallback to demo sources:', err.message);
-    return DEMO_SOURCES;
+    const token = getStoredToken();
+    if (token === 'demo_token_supermemory_2026') {
+      return DEMO_SOURCES;
+    }
+    console.warn('[sourcesApi] Error fetching sources:', err.message);
+    return [];
   }
 }
 

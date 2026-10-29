@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Database,
   FileText,
@@ -14,11 +14,17 @@ import {
   Plus,
   X,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react';
 import { useWorkspace } from '../context/WorkspaceContext';
+import { getStoredToken } from '../api/client';
+import { fetchSources, createSource } from '../api/sourcesApi';
+import AddSourceModal from '../components/sources/AddSourceModal';
 
-export function WorkspaceOverview({ onOpenEmbedModal }) {
+export function WorkspaceOverview({ onOpenEmbedModal, onSelectTab }) {
   const { activeWorkspace, updateSettings, rotateKey } = useWorkspace();
   const [copiedKey, setCopiedKey] = useState(null);
   const [showApiKey, setShowApiKey] = useState(false);
@@ -27,8 +33,30 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
   const [domains, setDomains] = useState(activeWorkspace?.allowed_domains || []);
   const [domainStatus, setDomainStatus] = useState(null);
 
-  // Sync state if activeWorkspace changes
-  React.useEffect(() => {
+  // Real knowledge sources & Add Source Modal state
+  const [sources, setSources] = useState([]);
+  const [isLoadingSources, setIsLoadingSources] = useState(false);
+  const [isAddSourceOpen, setIsAddSourceOpen] = useState(false);
+
+  const loadSources = useCallback(async () => {
+    if (!activeWorkspace) return;
+    setIsLoadingSources(true);
+    try {
+      const data = await fetchSources();
+      setSources(data || []);
+    } catch (err) {
+      console.warn('[WorkspaceOverview] Could not load sources:', err);
+    } finally {
+      setIsLoadingSources(false);
+    }
+  }, [activeWorkspace]);
+
+  useEffect(() => {
+    loadSources();
+  }, [loadSources]);
+
+  // Sync domains state if activeWorkspace changes
+  useEffect(() => {
     if (activeWorkspace?.allowed_domains) {
       setDomains(activeWorkspace.allowed_domains);
     }
@@ -84,13 +112,37 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
     }
   };
 
-  const stats = activeWorkspace?.stats || {
-    total_sources: 3,
-    total_pages: 84,
-    total_chunks: 340,
-    chat_requests_24h: 194,
-    avg_latency_ms: 360
+  const handleAddSource = async (formData) => {
+    const res = await createSource(formData);
+    if (res?.source) {
+      setSources(prev => [res.source, ...prev]);
+    }
+    loadSources();
+    if (onSelectTab) {
+      onSelectTab('sources');
+    }
   };
+
+  // Determine whether this is demo mode or a real user workspace
+  const isDemo = getStoredToken() === 'demo_token_supermemory_2026';
+  const totalPages = sources.reduce((sum, s) => sum + (s.pages_indexed || 0), 0);
+  const totalChunks = sources.reduce((sum, s) => sum + (s.chunks_stored || 0), 0);
+
+  const stats = isDemo
+    ? (activeWorkspace?.stats || {
+        total_sources: 3,
+        total_pages: 84,
+        total_chunks: 340,
+        chat_requests_24h: 194,
+        avg_latency_ms: 360
+      })
+    : {
+        total_sources: sources.length,
+        total_pages: totalPages,
+        total_chunks: totalChunks,
+        chat_requests_24h: activeWorkspace?.stats?.chat_requests_24h || 0,
+        avg_latency_ms: activeWorkspace?.stats?.avg_latency_ms || 0
+      };
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -98,20 +150,34 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">
-              {activeWorkspace?.name || 'Workspace'} Overview
+            <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <span>{activeWorkspace?.name || 'Workspace'} Overview</span>
+              {isDemo && (
+                <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Demo Workspace
+                </span>
+              )}
             </h2>
             <p className="text-sm text-slate-400 mt-1">
               Real-time vector memory metrics, API credentials, and domain security settings.
             </p>
           </div>
-          <button
-            onClick={onOpenEmbedModal}
-            className="px-4 py-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-slate-200 hover:text-white border border-slate-700/80 text-xs font-semibold flex items-center gap-2 self-start sm:self-auto transition-all shadow-sm"
-          >
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Deployment Guide</span>
-          </button>
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => setIsAddSourceOpen(true)}
+              className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-glow-brand flex items-center gap-2 transition-all active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Knowledge Source</span>
+            </button>
+            <button
+              onClick={onOpenEmbedModal}
+              className="px-4 py-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-slate-200 hover:text-white border border-slate-700/80 text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Deployment Snippet</span>
+            </button>
+          </div>
         </div>
 
         {/* 4 Metric Cards */}
@@ -129,7 +195,7 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
               <span className="text-xs text-indigo-400 font-medium">sources</span>
             </div>
             <div className="mt-2 text-[11px] text-slate-400">
-              Websites & Documentation portals
+              {stats.total_sources === 0 ? 'No sources connected yet' : 'Websites & Documentation portals'}
             </div>
           </div>
 
@@ -146,7 +212,7 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
               <span className="text-xs text-brand-400 font-medium">pages</span>
             </div>
             <div className="mt-2 text-[11px] text-slate-400">
-              Indexed into {stats.total_chunks || (stats.total_pages * 4)} vector chunks
+              {stats.total_pages === 0 ? 'Add URLs to begin crawling' : `Indexed into ${stats.total_chunks || (stats.total_pages * 4)} vector chunks`}
             </div>
           </div>
 
@@ -163,7 +229,7 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
               <span className="text-xs text-emerald-400 font-medium">queries</span>
             </div>
             <div className="mt-2 text-[11px] text-emerald-400/80 font-medium flex items-center gap-1">
-              <span>99.8% citation coverage</span>
+              <span>{stats.chat_requests_24h === 0 ? 'Live visitor query ticker' : '99.8% citation coverage'}</span>
             </div>
           </div>
 
@@ -176,7 +242,7 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white tracking-tight">{stats.avg_latency_ms}</span>
+              <span className="text-2xl font-bold text-white tracking-tight">{stats.avg_latency_ms || 320}</span>
               <span className="text-xs text-cyan-400 font-medium">ms</span>
             </div>
             <div className="mt-2 text-[11px] text-slate-400">
@@ -185,6 +251,121 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
           </div>
         </div>
       </div>
+
+      {/* Primary Getting Started Banner: Connect Knowledge Source */}
+      {sources.length === 0 ? (
+        <div className="glass-card p-6 rounded-2xl border border-brand-500/30 bg-gradient-to-r from-brand-950/40 via-surface-900 to-indigo-950/40 space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-glow-brand shrink-0">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Connect Your Company Knowledge</h3>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Your vector memory is currently empty. Add your website URL, documentation portal, or FAQ link below to train your private AI assistant.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsAddSourceOpen(true)}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-glow-brand flex items-center gap-2 self-start sm:self-auto transition-all active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Add Your First Website / Docs</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            <div
+              onClick={() => setIsAddSourceOpen(true)}
+              className="p-4 rounded-xl bg-surface-950/70 border border-slate-800/90 hover:border-brand-500/50 cursor-pointer transition-all group"
+            >
+              <div className="flex items-center gap-2 text-brand-400 font-semibold text-xs">
+                <Globe className="w-4 h-4" />
+                <span>Company Website & FAQs</span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                Domain-fenced crawler scans marketing pages, pricing, and FAQ URLs recursively.
+              </p>
+            </div>
+
+            <div
+              onClick={() => setIsAddSourceOpen(true)}
+              className="p-4 rounded-xl bg-surface-950/70 border border-slate-800/90 hover:border-indigo-500/50 cursor-pointer transition-all group"
+            >
+              <div className="flex items-center gap-2 text-indigo-400 font-semibold text-xs">
+                <FileText className="w-4 h-4" />
+                <span>Developer / Product Docs</span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                Indexes GitBook, Mintlify, ReadMe, Docusaurus, or Sphinx documentation portals.
+              </p>
+            </div>
+
+            <div
+              onClick={() => onSelectTab && onSelectTab('sources')}
+              className="p-4 rounded-xl bg-surface-950/70 border border-slate-800/90 hover:border-emerald-500/50 cursor-pointer transition-all group"
+            >
+              <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs">
+                <Database className="w-4 h-4" />
+                <span>Knowledge Sources Hub</span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5 leading-relaxed">
+                <span>View full crawler monitor & real-time SSE progress</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="glass-card p-6 rounded-2xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+            <div>
+              <h3 className="text-base font-semibold text-white flex items-center gap-2">
+                <span>Connected Knowledge Sources ({sources.length})</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-medium">
+                  Active
+                </span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">Websites and documentation portals indexing into Qdrant memory.</p>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setIsAddSourceOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Source</span>
+              </button>
+              {onSelectTab && (
+                <button
+                  onClick={() => onSelectTab('sources')}
+                  className="px-3.5 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-slate-300 text-xs font-medium flex items-center gap-1 transition-all border border-slate-700"
+                >
+                  <span>Manage All</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {sources.slice(0, 6).map(s => (
+              <div key={s._id} className="p-4 rounded-xl bg-surface-950/60 border border-slate-800/80 flex items-center justify-between hover:border-slate-700 transition-colors">
+                <div className="min-w-0 pr-3">
+                  <h4 className="text-xs font-semibold text-white truncate">{s.name}</h4>
+                  <a href={s.url} target="_blank" rel="noreferrer" className="text-[11px] text-slate-400 truncate hover:text-brand-400 block mt-0.5 font-mono">
+                    {s.url}
+                  </a>
+                </div>
+                <span className="text-[10px] px-2.5 py-1 rounded-full bg-slate-800/90 text-brand-300 shrink-0 font-medium border border-slate-700">
+                  {s.pages_indexed || 0} pages
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Grid: Credentials & Keys (Left) and Allowed Domains (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -355,6 +536,13 @@ export function WorkspaceOverview({ onOpenEmbedModal }) {
           </div>
         </div>
       </div>
+
+      {/* Add Source Modal directly accessible from Overview */}
+      <AddSourceModal
+        isOpen={isAddSourceOpen}
+        onClose={() => setIsAddSourceOpen(false)}
+        onSubmit={handleAddSource}
+      />
     </div>
   );
 }
