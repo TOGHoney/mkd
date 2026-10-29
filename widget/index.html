@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperMemory AI Widget - Test & Demo Host Site</title>
+  
+  <!-- Intentionally aggressive host website CSS to prove Shadow DOM zero-bleeding invariant -->
+  <style>
+    * {
+      font-family: "Courier New", Courier, monospace !important;
+      color: #991b1b !important;
+    }
+    body {
+      background: #f8fafc;
+      padding: 40px;
+      margin: 0;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    p {
+      line-height: 1.8;
+      max-width: 680px;
+      margin-bottom: 24px;
+    }
+    .demo-card {
+      background: #ffffff;
+      border: 2px dashed #dc2626;
+      padding: 24px;
+      border-radius: 8px;
+      max-width: 700px;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-card">
+    <h1>Host Company Website (Heavy Global CSS)</h1>
+    <p>
+      Notice that this host site declares aggressive global styles: red text, Courier New monospace font, and dashed borders.
+    </p>
+    <p>
+      Look at the floating SuperMemory AI chat widget in the bottom-right corner: thanks to native <strong>Shadow DOM encapsulation</strong>, the widget remains pristine with modern typography, smooth gradients, and zero styling leakage!
+    </p>
+  </div>
+
+  <!-- Single line embed script tag -->
+  <script
+    type="module"
+    src="./src/widget.js"
+    data-widget-key="wk_live_demo1234567890abcdef"
+    data-api-host="http://localhost:5000"
+  ></script>
+</body>
+</html>

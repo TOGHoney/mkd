@@ -43,11 +43,11 @@
 - [x] **QUEUE-04**: Chat gateway endpoint verifies `widget_key`, validates `Origin` against `allowed_domains`, and applies Redis sliding-window rate limiting.
 
 ### 7. Embeddable Chat Widget (Vanilla JS + Shadow DOM)
-- [ ] **WIDG-01**: Zero-dependency standalone JavaScript bundle (`widget.js`) embeddable via a single `<script>` tag.
-- [ ] **WIDG-02**: Entire widget UI is encapsulated inside Shadow DOM (`attachShadow({ mode: 'open' })`) to prevent host website CSS style pollution.
-- [ ] **WIDG-03**: Widget renders a floating launcher badge and responsive collapsible chat window with customizable theme colors.
-- [ ] **WIDG-04**: Widget connects to the streaming chat API and renders typewriter streaming text with markdown support.
-- [ ] **WIDG-05**: Widget displays clickable source citations at the bottom of assistant responses.
+- [x] **WIDG-01**: Zero-dependency standalone JavaScript bundle (`widget.js`) embeddable via a single `<script>` tag.
+- [x] **WIDG-02**: Entire widget UI is encapsulated inside Shadow DOM (`attachShadow({ mode: 'open' })`) to prevent host website CSS style pollution.
+- [x] **WIDG-03**: Widget renders a floating launcher badge and responsive collapsible chat window with customizable theme colors.
+- [x] **WIDG-04**: Widget connects to the streaming chat API and renders typewriter streaming text with markdown support.
+- [x] **WIDG-05**: Widget displays clickable source citations at the bottom of assistant responses.
 
 ### 8. Company Admin Dashboard (React + Tailwind)
 - [ ] **DASH-01**: Modern dashboard displaying workspace overview, active sources, and widget configuration.
@@ -113,11 +113,11 @@
 | QUEUE-02 | Phase 3 | Complete |
 | QUEUE-03 | Phase 3 | Complete |
 | QUEUE-04 | Phase 3 | Complete |
-| WIDG-01 | Phase 4 | Pending |
-| WIDG-02 | Phase 4 | Pending |
-| WIDG-03 | Phase 4 | Pending |
-| WIDG-04 | Phase 4 | Pending |
-| WIDG-05 | Phase 4 | Pending |
+| WIDG-01 | Phase 4 | Complete |
+| WIDG-02 | Phase 4 | Complete |
+| WIDG-03 | Phase 4 | Complete |
+| WIDG-04 | Phase 4 | Complete |
+| WIDG-05 | Phase 4 | Complete |
 | DASH-01 | Phase 5 | Pending |
 | DASH-02 | Phase 5 | Pending |
 | DASH-03 | Phase 5 | Pending |

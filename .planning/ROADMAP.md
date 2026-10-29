@@ -11,7 +11,7 @@ SuperMemory AI transforms scattered company knowledge into an embeddable, privat
 - [x] **Phase 1: Ingestion & Vector Storage Pipeline** - Python FastAPI crawler, recursive chunker, FastEmbed embeddings, and tenant-isolated Qdrant vector storage.
 - [x] **Phase 2: Semantic RAG & Streaming Generation** - Tenant-filtered Qdrant retrieval, grounded context assembly, Groq Llama 3.3 streaming, and verified source citations.
 - [x] **Phase 3: Control Backend & Ingestion Job Queue** - Node.js Express server, MongoDB Atlas models, BullMQ Redis queue, domain whitelisting, and rate-limiting.
-- [ ] **Phase 4: Embeddable Chat Widget** - Standalone Vanilla JS Web Component with Shadow DOM encapsulation, typewriter streaming, and citation links.
+- [x] **Phase 4: Embeddable Chat Widget** - Standalone Vanilla JS Web Component with Shadow DOM encapsulation, typewriter streaming, and citation links.
 - [ ] **Phase 5: Company Admin Dashboard** - React + Tailwind dashboard for source management, crawler monitoring, live widget customization, and embed snippet distribution.
 
 ---
@@ -83,8 +83,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Custom Web Component architecture, Shadow DOM encapsulation, responsive chat window layout, and theme customization.
-- [ ] 04-02: SSE streaming client integration, typewriter message renderer, source citation badge component, and standalone bundle build.
+- [x] 04-01: Custom Web Component architecture, Shadow DOM encapsulation, responsive chat window layout, and theme customization.
+- [x] 04-02: SSE streaming client integration, typewriter message renderer, source citation badge component, and standalone bundle build.
 
 ---
 
@@ -117,9 +117,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Ingestion & Vector Storage Pipeline | 3/3 | Complete | 2026-10-29 |
 | 2. Semantic RAG & Streaming Generation | 2/2 | Complete | 2026-10-29 |
 | 3. Control Backend & Ingestion Job Queue | 3/3 | Complete | 2026-10-29 |
-| 4. Embeddable Chat Widget | 0/2 | Not started | - |
+| 4. Embeddable Chat Widget | 2/2 | Complete | 2026-10-29 |
 | 5. Company Admin Dashboard | 0/3 | Not started | - |
 
 ---
 *Roadmap updated: 2026-10-29*
-*Next step: `/gsd-execute-phase 4`*
+*Next step: `/gsd-plan-phase 5`*

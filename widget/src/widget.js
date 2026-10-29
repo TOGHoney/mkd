@@ -1,6 +1,9 @@
 import { getScopedStyles } from './styles.js';
 import { createLauncherButton } from './components/launcher.js';
 import { createChatWindow } from './components/chatWindow.js';
+import { streamWidgetChat } from './api/sseClient.js';
+import { renderMarkdown } from './utils/markdown.js';
+import { createCitationBadges } from './components/citations.js';
 
 const BaseElement = typeof HTMLElement !== 'undefined' ? HTMLElement : class MockHTMLElement {};
 
@@ -13,6 +16,7 @@ export class SuperMemoryChat extends BaseElement {
     this.styleEl = null;
     this.widgetKey = null;
     this.apiHost = 'http://localhost:5000';
+    this.sessionId = 'sess_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
     this.config = {
       botName: 'SuperMemory AI',
       welcomeMessage: 'Hi there! How can I help you today?',
@@ -106,21 +110,49 @@ export class SuperMemoryChat extends BaseElement {
   }
 
   handleUserMessage(userText) {
-    // Dispatched to chat window; in Plan 04-02 this connects to SSE streaming client
     if (this._onMessageHook) {
       this._onMessageHook(userText);
-    } else {
-      // Default handler
-      this.chatWindow.addMessage('user', `<p>${this.escapeText(userText)}</p>`);
-      this.chatWindow.startAssistantStreaming();
-
-      setTimeout(() => {
-        this.chatWindow.updateAssistantBubble(
-          `<p>Thank you for asking: "${this.escapeText(userText)}". Our knowledge base is ready to stream verified citations!</p>`
-        );
-        this.chatWindow.endAssistantStreaming();
-      }, 400);
+      return;
     }
+
+    // 1. Append user query bubble
+    this.chatWindow.addMessage('user', `<p>${this.escapeText(userText)}</p>`);
+
+    // 2. Start assistant bubble with loading animation
+    this.chatWindow.startAssistantStreaming();
+
+    let accumulatedText = '';
+    let capturedCitations = [];
+
+    // 3. Connect to SSE stream
+    streamWidgetChat({
+      apiHost: this.apiHost,
+      widgetKey: this.widgetKey,
+      message: userText,
+      sessionId: this.sessionId,
+      onToken: (token, fullText) => {
+        accumulatedText = fullText;
+        this.chatWindow.updateAssistantBubble(renderMarkdown(fullText));
+      },
+      onCitations: (citations) => {
+        capturedCitations = citations;
+      },
+      onDone: ({ fullText, citations }) => {
+        const finalCitations = citations && citations.length > 0 ? citations : capturedCitations;
+        const badgesContainer = createCitationBadges(finalCitations);
+        this.chatWindow.endAssistantStreaming(badgesContainer);
+      },
+      onError: (errorMsg, status) => {
+        let userFacingError = 'Sorry, I encountered an issue connecting to the knowledge base. Please try again in a moment.';
+        if (status === 403) {
+          userFacingError = 'This chat widget is not authorized to display on this domain. Please check your workspace allowed domains.';
+        } else if (status === 429) {
+          userFacingError = 'You are sending questions too quickly. Please pause for a moment before asking again.';
+        }
+        this.chatWindow.updateAssistantBubble(`<p style="color: #ef4444;">${userFacingError}</p>`);
+        this.chatWindow.endAssistantStreaming();
+      }
+    });
   }
 
   escapeText(str) {
