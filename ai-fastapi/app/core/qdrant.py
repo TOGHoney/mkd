@@ -1,8 +1,13 @@
 import logging
-from typing import Optional
-from qdrant_client import QdrantClient
-from qdrant_client.http import models
-from qdrant_client.http.exceptions import UnexpectedResponse
+from typing import Optional, Any
+try:
+    from qdrant_client import QdrantClient
+    from qdrant_client.http import models
+    from qdrant_client.http.exceptions import UnexpectedResponse
+except ImportError:
+    QdrantClient = None
+    models = None
+    UnexpectedResponse = Exception
 
 from app.core.config import settings
 
@@ -11,10 +16,13 @@ logger = logging.getLogger(__name__)
 _qdrant_client: Optional[QdrantClient] = None
 
 
-def get_qdrant_client() -> QdrantClient:
+def get_qdrant_client() -> Optional[Any]:
     """Returns a singleton QdrantClient instance."""
     global _qdrant_client
     if _qdrant_client is None:
+        if QdrantClient is None:
+            logger.warning("qdrant_client package not installed; client instance is None.")
+            return None
         logger.info(f"Connecting to Qdrant at {settings.QDRANT_URL}...")
         _qdrant_client = QdrantClient(
             url=settings.QDRANT_URL,

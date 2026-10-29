@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.qdrant import init_qdrant_collection
-from app.api import health, crawl, ingest, search
+from app.api import health, crawl, ingest, search, rag
 
 # Configure logging
 logging.basicConfig(
@@ -47,6 +47,7 @@ app.include_router(health.router, prefix="/api/v1")
 app.include_router(crawl.router, prefix="/api/v1")
 app.include_router(ingest.router, prefix="/api/v1")
 app.include_router(search.router, prefix="/api/v1")
+app.include_router(rag.router, prefix="/api/v1")
 
 
 if __name__ == "__main__":

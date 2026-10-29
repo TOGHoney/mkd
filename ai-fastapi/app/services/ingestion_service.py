@@ -2,7 +2,10 @@ import datetime
 import logging
 import uuid
 from typing import Dict, Any, List
-from qdrant_client.http import models
+try:
+    from qdrant_client.http import models
+except ImportError:
+    models = None
 
 from app.core.config import settings
 from app.core.qdrant import get_qdrant_client

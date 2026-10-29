@@ -31,10 +31,10 @@
 - [x] **VECT-03**: `workspace_id` is indexed as a keyword field in Qdrant; every vector query enforces a strict payload match filter.
 
 ### 5. RAG Retrieval & Groq LLM Generation
-- [ ] **RAG-01**: User query is embedded via FastEmbed and matched against Qdrant top-k (K=4–6) vectors with cosine similarity thresholding (>= 0.65).
-- [ ] **RAG-02**: Prompt builder constructs grounded context including document titles and source URLs, instructing the LLM to avoid speculation.
-- [ ] **RAG-03**: Groq Llama 3.3 70B Versatile streams grounded responses with sub-1.5s time-to-first-token.
-- [ ] **RAG-04**: Response includes markdown links to cited source URLs used to answer the question.
+- [x] **RAG-01**: User query is embedded via FastEmbed and matched against Qdrant top-k (K=4–6) vectors with cosine similarity thresholding (>= 0.65).
+- [x] **RAG-02**: Prompt builder constructs grounded context including document titles and source URLs, instructing the LLM to avoid speculation.
+- [x] **RAG-03**: Groq Llama 3.3 70B Versatile streams grounded responses with sub-1.5s time-to-first-token.
+- [x] **RAG-04**: Response includes markdown links to cited source URLs used to answer the question.
 
 ### 6. Control Backend & Job Queue
 - [ ] **QUEUE-01**: Adding a source enqueues an ingestion job in BullMQ + Redis and immediately returns an HTTP 202 with `job_id`.
@@ -105,10 +105,10 @@
 | VECT-01 | Phase 1 | Complete |
 | VECT-02 | Phase 1 | Complete |
 | VECT-03 | Phase 1 | Complete |
-| RAG-01 | Phase 2 | Pending |
-| RAG-02 | Phase 2 | Pending |
-| RAG-03 | Phase 2 | Pending |
-| RAG-04 | Phase 2 | Pending |
+| RAG-01 | Phase 2 | Complete |
+| RAG-02 | Phase 2 | Complete |
+| RAG-03 | Phase 2 | Complete |
+| RAG-04 | Phase 2 | Complete |
 | QUEUE-01 | Phase 3 | Pending |
 | QUEUE-02 | Phase 3 | Pending |
 | QUEUE-03 | Phase 3 | Pending |
