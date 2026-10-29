@@ -20,10 +20,10 @@ See: .planning/PROJECT.md (updated 2026-10-29)
 
 ## Current Position
 
-Phase: 2 of 5 (Semantic RAG & Streaming Generation) - COMPLETE
-Plan: 2 of 2 completed
-Status: Phase 2 complete, ready to plan Phase 3
-Last activity: 2026-10-29 — Phase 2 executed and verified (2/2 plans complete)
+Phase: 3 of 5 (Control Backend & Ingestion Job Queue) - READY TO EXECUTE
+Plan: 0 of 3 completed
+Status: Phase 3 planned, ready to execute Wave 1 (Plan 03-01)
+Last activity: 2026-10-29 — Phase 3 planned (3 plans across 2 waves)
 
 Progress: [████░░░░░░] 38%
 
