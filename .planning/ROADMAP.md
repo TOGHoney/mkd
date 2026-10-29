@@ -115,11 +115,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Ingestion & Vector Storage Pipeline | 3/3 | Complete | 2026-10-29 |
-| 2. Semantic RAG & Streaming Generation | 0/2 | Not started | - |
+| 2. Semantic RAG & Streaming Generation | 0/2 | Ready to execute | - |
 | 3. Control Backend & Ingestion Job Queue | 0/3 | Not started | - |
 | 4. Embeddable Chat Widget | 0/2 | Not started | - |
 | 5. Company Admin Dashboard | 0/3 | Not started | - |
 
 ---
 *Roadmap updated: 2026-10-29*
-*Next step: `/gsd-plan-phase 2`*
+*Next step: `/gsd-execute-phase 2`*
