@@ -20,10 +20,10 @@ See: .planning/PROJECT.md (updated 2026-10-29)
 
 ## Current Position
 
-Phase: 3 of 5 (Control Backend & Ingestion Job Queue) - COMPLETE
-Plan: 3 of 3 completed
-Status: Phase 3 complete, ready to plan Phase 4
-Last activity: 2026-10-29 — Phase 3 executed and verified (3/3 plans complete)
+Phase: 4 of 5 (Embeddable Chat Widget) - READY TO EXECUTE
+Plan: 0 of 2 completed
+Status: Phase 4 planned, ready to execute Wave 1 (Plan 04-01)
+Last activity: 2026-10-29 — Phase 4 planned (2 plans across 2 waves)
 
 Progress: [██████░░░░] 62%
 
