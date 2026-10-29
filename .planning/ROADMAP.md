@@ -10,7 +10,7 @@ SuperMemory AI transforms scattered company knowledge into an embeddable, privat
 
 - [x] **Phase 1: Ingestion & Vector Storage Pipeline** - Python FastAPI crawler, recursive chunker, FastEmbed embeddings, and tenant-isolated Qdrant vector storage.
 - [x] **Phase 2: Semantic RAG & Streaming Generation** - Tenant-filtered Qdrant retrieval, grounded context assembly, Groq Llama 3.3 streaming, and verified source citations.
-- [ ] **Phase 3: Control Backend & Ingestion Job Queue** - Node.js Express server, MongoDB Atlas models, BullMQ Redis queue, domain whitelisting, and rate-limiting.
+- [x] **Phase 3: Control Backend & Ingestion Job Queue** - Node.js Express server, MongoDB Atlas models, BullMQ Redis queue, domain whitelisting, and rate-limiting.
 - [ ] **Phase 4: Embeddable Chat Widget** - Standalone Vanilla JS Web Component with Shadow DOM encapsulation, typewriter streaming, and citation links.
 - [ ] **Phase 5: Company Admin Dashboard** - React + Tailwind dashboard for source management, crawler monitoring, live widget customization, and embed snippet distribution.
 
@@ -65,9 +65,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: Express backend setup, MongoDB connection, JWT auth, and User/Workspace/Source models with widget key generation.
-- [ ] 03-02: BullMQ queue and Redis worker integration for async ingestion jobs with status polling/SSE endpoints.
-- [ ] 03-03: Public widget gateway endpoint with origin domain whitelisting, Redis sliding-window rate limiter, and conversation logging.
+- [x] 03-01: Express backend setup, MongoDB connection, JWT auth, and User/Workspace/Source models with widget key generation.
+- [x] 03-02: BullMQ queue and Redis worker integration for async ingestion jobs with status polling/SSE endpoints.
+- [x] 03-03: Public widget gateway endpoint with origin domain whitelisting, Redis sliding-window rate limiter, and conversation logging.
 
 ---
 
@@ -116,10 +116,10 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Ingestion & Vector Storage Pipeline | 3/3 | Complete | 2026-10-29 |
 | 2. Semantic RAG & Streaming Generation | 2/2 | Complete | 2026-10-29 |
-| 3. Control Backend & Ingestion Job Queue | 0/3 | Not started | - |
+| 3. Control Backend & Ingestion Job Queue | 3/3 | Complete | 2026-10-29 |
 | 4. Embeddable Chat Widget | 0/2 | Not started | - |
 | 5. Company Admin Dashboard | 0/3 | Not started | - |
 
 ---
 *Roadmap updated: 2026-10-29*
-*Next step: `/gsd-execute-phase 3`*
+*Next step: `/gsd-plan-phase 4`*

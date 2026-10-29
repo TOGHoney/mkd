@@ -17,6 +17,11 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const sourceRoutes = require('./routes/sourceRoutes');
+const jobRoutes = require('./routes/jobRoutes');
+const widgetRoutes = require('./routes/widgetRoutes');
+const conversationRoutes = require('./routes/conversationRoutes');
+
 // Health Check Probe
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -30,6 +35,10 @@ app.get('/health', (req, res) => {
 // Mount Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/workspaces', workspaceRoutes);
+app.use('/api/v1/sources', sourceRoutes);
+app.use('/api/v1/jobs', jobRoutes);
+app.use('/api/v1/widget', widgetRoutes);
+app.use('/api/v1/conversations', conversationRoutes);
 
 // Optional route mounting placeholder for source/job/widget routes in subsequent plans
 app.use((req, res, next) => {

@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+// Never buffer commands indefinitely when database is offline
+mongoose.set('bufferCommands', false);
+
 let isConnected = false;
 
 /**

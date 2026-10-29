@@ -8,10 +8,10 @@
 ## v1 Requirements
 
 ### 1. Multi-Tenancy & Authentication
-- [ ] **AUTH-01**: Company admin can register an account, log in with JWT authentication, and manage sessions.
-- [ ] **AUTH-02**: System automatically provisions a default `workspace_id` and unique `widget_key` upon workspace creation.
-- [ ] **AUTH-03**: Backend generates scoped public widget tokens with domain-origin whitelist enforcement.
-- [ ] **AUTH-04**: System validates that API queries reject any cross-tenant data requests.
+- [x] **AUTH-01**: Company admin can register an account, log in with JWT authentication, and manage sessions.
+- [x] **AUTH-02**: System automatically provisions a default `workspace_id` and unique `widget_key` upon workspace creation.
+- [x] **AUTH-03**: Backend generates scoped public widget tokens with domain-origin whitelist enforcement.
+- [x] **AUTH-04**: System validates that API queries reject any cross-tenant data requests.
 
 ### 2. Web Ingestion & Crawling Engine
 - [x] **INGEST-01**: Crawler discovers and traverses URLs from a base website URL or sitemap up to configured depth limits (max depth 3, max 50 pages).
@@ -37,10 +37,10 @@
 - [x] **RAG-04**: Response includes markdown links to cited source URLs used to answer the question.
 
 ### 6. Control Backend & Job Queue
-- [ ] **QUEUE-01**: Adding a source enqueues an ingestion job in BullMQ + Redis and immediately returns an HTTP 202 with `job_id`.
-- [ ] **QUEUE-02**: BullMQ worker dispatches crawling tasks to FastAPI and tracks job lifecycle (Pending, Crawling, Indexing, Done, Failed).
-- [ ] **QUEUE-03**: Backend provides an SSE or polling endpoint for real-time ingestion progress updates in the dashboard.
-- [ ] **QUEUE-04**: Chat gateway endpoint verifies `widget_key`, validates `Origin` against `allowed_domains`, and applies Redis sliding-window rate limiting.
+- [x] **QUEUE-01**: Adding a source enqueues an ingestion job in BullMQ + Redis and immediately returns an HTTP 202 with `job_id`.
+- [x] **QUEUE-02**: BullMQ worker dispatches crawling tasks to FastAPI and tracks job lifecycle (Pending, Crawling, Indexing, Done, Failed).
+- [x] **QUEUE-03**: Backend provides an SSE or polling endpoint for real-time ingestion progress updates in the dashboard.
+- [x] **QUEUE-04**: Chat gateway endpoint verifies `widget_key`, validates `Origin` against `allowed_domains`, and applies Redis sliding-window rate limiting.
 
 ### 7. Embeddable Chat Widget (Vanilla JS + Shadow DOM)
 - [ ] **WIDG-01**: Zero-dependency standalone JavaScript bundle (`widget.js`) embeddable via a single `<script>` tag.
@@ -90,10 +90,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 3 | Pending |
-| AUTH-02 | Phase 3 | Pending |
-| AUTH-03 | Phase 3 | Pending |
-| AUTH-04 | Phase 3 | Pending |
+| AUTH-01 | Phase 3 | Complete |
+| AUTH-02 | Phase 3 | Complete |
+| AUTH-03 | Phase 3 | Complete |
+| AUTH-04 | Phase 3 | Complete |
 | INGEST-01 | Phase 1 | Complete |
 | INGEST-02 | Phase 1 | Complete |
 | INGEST-03 | Phase 1 | Complete |
@@ -109,10 +109,10 @@
 | RAG-02 | Phase 2 | Complete |
 | RAG-03 | Phase 2 | Complete |
 | RAG-04 | Phase 2 | Complete |
-| QUEUE-01 | Phase 3 | Pending |
-| QUEUE-02 | Phase 3 | Pending |
-| QUEUE-03 | Phase 3 | Pending |
-| QUEUE-04 | Phase 3 | Pending |
+| QUEUE-01 | Phase 3 | Complete |
+| QUEUE-02 | Phase 3 | Complete |
+| QUEUE-03 | Phase 3 | Complete |
+| QUEUE-04 | Phase 3 | Complete |
 | WIDG-01 | Phase 4 | Pending |
 | WIDG-02 | Phase 4 | Pending |
 | WIDG-03 | Phase 4 | Pending |
