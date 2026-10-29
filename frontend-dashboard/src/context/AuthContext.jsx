@@ -71,11 +71,17 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const register = useCallback(async ({ email, password, company_name }) => {
+  const register = useCallback(async ({ email, password, company_name, name }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await client.post('/auth/register', { email, password, company_name });
+      const displayName = company_name || name;
+      const res = await client.post('/auth/register', {
+        email,
+        password,
+        name: displayName,
+        company_name: displayName
+      });
       setStoredToken(res.token);
       setToken(res.token);
       setUser(res.user);

@@ -7,10 +7,11 @@ const { generateToken } = require('../middlewares/auth');
  * Automatically provisions a default workspace and unique widget_key (AUTH-01, AUTH-02).
  */
 async function register(req, res) {
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
+  const name = req.body.name || req.body.company_name;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Name, email, and password are required' });
+    return res.status(400).json({ error: 'Company/User name, email, and password are required' });
   }
 
   if (password.length < 6) {
@@ -31,8 +32,9 @@ async function register(req, res) {
     });
 
     // 2. Auto-provision default workspace (AUTH-02)
+    const workspaceName = req.body.company_name || `${name}'s Workspace`;
     const workspace = await Workspace.create({
-      name: `${name}'s Workspace`,
+      name: workspaceName,
       owner_id: user._id,
       allowed_domains: ['*'],
       widget_settings: {

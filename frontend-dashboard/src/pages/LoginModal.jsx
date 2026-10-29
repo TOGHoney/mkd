@@ -18,7 +18,7 @@ export function LoginModal() {
 
     try {
       if (isRegister) {
-        await register({ email, password, company_name: companyName });
+        await register({ email, password, company_name: companyName, name: companyName });
       } else {
         await login({ email, password });
       }
