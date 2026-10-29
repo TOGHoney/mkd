@@ -122,4 +122,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 ---
 *Roadmap updated: 2026-10-29*
-*Next step: `/gsd-plan-phase 5`*
+*Next step: `/gsd-execute-phase 5`*
