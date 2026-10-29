@@ -50,11 +50,11 @@
 - [x] **WIDG-05**: Widget displays clickable source citations at the bottom of assistant responses.
 
 ### 8. Company Admin Dashboard (React + Tailwind)
-- [ ] **DASH-01**: Modern dashboard displaying workspace overview, active sources, and widget configuration.
-- [ ] **DASH-02**: Sources view allows adding websites, triggering crawls, and inspecting real-time progress bars.
-- [ ] **DASH-03**: Widget Customizer provides real-time preview of chat bubble position, brand colors, bot name, and welcome greeting.
-- [ ] **DASH-04**: Embed Modal provides one-click copy of the `<script>` tag with the workspace's widget key.
-- [ ] **DASH-05**: Conversation Logs view displays past user queries, bot answers, retrieved citations, and latency.
+- [x] **DASH-01**: Modern dashboard displaying workspace overview, active sources, and widget configuration.
+- [x] **DASH-02**: Sources view allows adding websites, triggering crawls, and inspecting real-time progress bars.
+- [x] **DASH-03**: Widget Customizer provides real-time preview of chat bubble position, brand colors, bot name, and welcome greeting.
+- [x] **DASH-04**: Embed Modal provides one-click copy of the `<script>` tag with the workspace's widget key.
+- [x] **DASH-05**: Conversation Logs view displays past user queries, bot answers, retrieved citations, and latency.
 
 ---
 
@@ -118,11 +118,11 @@
 | WIDG-03 | Phase 4 | Complete |
 | WIDG-04 | Phase 4 | Complete |
 | WIDG-05 | Phase 4 | Complete |
-| DASH-01 | Phase 5 | Pending |
-| DASH-02 | Phase 5 | Pending |
-| DASH-03 | Phase 5 | Pending |
-| DASH-04 | Phase 5 | Pending |
-| DASH-05 | Phase 5 | Pending |
+| DASH-01 | Phase 5 | Complete |
+| DASH-02 | Phase 5 | Complete |
+| DASH-03 | Phase 5 | Complete |
+| DASH-04 | Phase 5 | Complete |
+| DASH-05 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 33 total
