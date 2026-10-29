@@ -1,0 +1,17 @@
+{
+  "name": "supermemory-chat-widget",
+  "version": "1.0.0",
+  "description": "Zero-dependency embeddable AI chat widget with native Shadow DOM encapsulation",
+  "type": "module",
+  "main": "dist/widget.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node tests/shadow_dom.test.js"
+  },
+  "devDependencies": {
+    "terser": "^5.37.0",
+    "vite": "^6.0.7"
+  }
+}
