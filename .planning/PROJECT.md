@@ -233,23 +233,24 @@ Raw documents cannot be fed directly to embedding models without losing granular
 
 ## Requirements
 
-### Validated
+### Validated (v1.0 Shipped)
 
-(None yet — ship to validate)
+- [x] Multi-tenant workspace management and API/Widget key generation in Node.js + MongoDB.
+- [x] Domain whitelist validation and rate-limiting middleware for public widget endpoints.
+- [x] BullMQ + Redis job queue for asynchronous source ingestion.
+- [x] Python FastAPI web crawler using Crawl4AI / Playwright + BeautifulSoup4 with markdown conversion.
+- [x] Recursive hierarchical text chunker with heading and URL metadata preservation.
+- [x] Local FastEmbed embedding generation (`bge-small-en-v1.5`) and Qdrant vector storage with payload filtering.
+- [x] Qdrant vector search with strict `workspace_id` isolation and similarity score filtering.
+- [x] Groq LLM integration (Llama 3.3 70B) with streaming response and citation extraction.
+- [x] Standalone Vanilla JS embeddable chat widget with Shadow DOM encapsulation and SSE streaming (<24KB).
+- [x] React + Tailwind company dashboard with workspace setup, source connectors, crawler monitor, live widget customizer, and conversation analytics.
 
-### Active
+### Active (v2.0 Milestone Candidates)
 
-- [ ] Multi-tenant workspace management and API/Widget key generation in Node.js + MongoDB.
-- [ ] Domain whitelist validation and rate-limiting middleware for public widget endpoints.
-- [ ] BullMQ + Redis job queue for asynchronous source ingestion.
-- [ ] Python FastAPI web crawler using Crawl4AI / Playwright + BeautifulSoup4 with markdown conversion.
-- [ ] Recursive hierarchical text chunker with heading and URL metadata preservation.
-- [ ] Local FastEmbed embedding generation (`bge-small-en-v1.5`) and Qdrant vector storage with payload filtering.
-- [ ] Qdrant vector search with strict `workspace_id` isolation and similarity score filtering.
-- [ ] Groq LLM integration (Llama 3.3 70B / 8B) with streaming response and citation extraction.
-- [ ] Hash-based sync engine for change detection and diff-based chunk updates/purges.
-- [ ] Standalone Vanilla JS embeddable chat widget with Shadow DOM encapsulation and SSE streaming.
-- [ ] React + Tailwind company dashboard with workspace setup, source connectors, crawler monitor, and widget customizer.
+- [ ] Hash-based continuous sync engine for scheduled change detection and diff-based chunk updates/purges.
+- [ ] Native PDF extraction with PyMuPDF and GitHub repository code chunking.
+- [ ] Visitor feedback collection (thumbs up/down) and prompt injection guardrails.
 
 ### Out of Scope
 
@@ -277,11 +278,11 @@ Raw documents cannot be fed directly to embedding models without losing granular
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Qdrant for Vector Database | High performance, native payload filtering by `workspace_id`, Docker & cloud readiness | — Pending |
-| Groq Cloud + FastEmbed | Blazing fast LLM inference (Llama 3.3) paired with zero-cost local CPU embeddings | — Pending |
-| Clean Monorepo Layout | Unified code management for dashboard, widget, Node backend, and Python AI engine | — Pending |
-| Shadow DOM for Chat Widget | Prevents host website CSS from conflicting with or breaking the embeddable chat UI | — Pending |
-| Split Backend (Node + Python) | Node handles secure business logic, auth, queues; Python handles heavy AI/crawling/RAG | — Pending |
+| Qdrant for Vector Database | High performance, native payload filtering by `workspace_id`, Docker & cloud readiness | ✓ Shipped in v1.0 |
+| Groq Cloud + FastEmbed | Blazing fast LLM inference (Llama 3.3) paired with zero-cost local CPU embeddings | ✓ Shipped in v1.0 |
+| Clean Monorepo Layout | Unified code management for dashboard, widget, Node backend, and Python AI engine | ✓ Shipped in v1.0 |
+| Shadow DOM for Chat Widget | Prevents host website CSS from conflicting with or breaking the embeddable chat UI | ✓ Shipped in v1.0 |
+| Split Backend (Node + Python) | Node handles secure business logic, auth, queues; Python handles heavy AI/crawling/RAG | ✓ Shipped in v1.0 |
 
 ---
 

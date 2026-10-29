@@ -16,14 +16,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-29)
 
 **Core value:** Turn any company's heterogeneous, dynamic documentation into an accurate, hallucination-free, self-updating vector memory that securely answers visitor questions with verified citations through an embeddable widget.
-**Current focus:** All v1 Phases Complete — Ready for Milestone Audit & Review
+**Current focus:** Milestone v1.0 Archived — Ready for next milestone (`/gsd-new-milestone`)
 
 ## Current Position
 
-Phase: 5 of 5 (Company Admin Dashboard) - COMPLETE
-Plan: 3 of 3 completed
-Status: All 5 phases executed and verified across 13 plans. 33 of 33 requirements validated.
-Last activity: 2026-10-29 — Phase 5 executed (React 18 + Vite dashboard, sources manager, live SSE ingestion monitor, widget designer with live preview, embed modal, conversation analytics)
+Phase: All 5 Phases Complete (Milestone v1.0 Shipped & Archived)
+Plan: 13 of 13 completed (100%)
+Status: Milestone v1.0 audit PASSED (33/33 requirements satisfied). Archived to `.planning/milestones/`.
+Last activity: 2026-10-29 — Milestone v1.0 archived (`v1.0-ROADMAP.md`, `v1.0-REQUIREMENTS.md`, `v1.0-MILESTONE-AUDIT.md`)
 
 Progress: [██████████] 100%
 
