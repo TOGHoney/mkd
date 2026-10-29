@@ -8,7 +8,7 @@ SuperMemory AI transforms scattered company knowledge into an embeddable, privat
 
 ## Phases
 
-- [ ] **Phase 1: Ingestion & Vector Storage Pipeline** - Python FastAPI crawler, recursive chunker, FastEmbed embeddings, and tenant-isolated Qdrant vector storage.
+- [x] **Phase 1: Ingestion & Vector Storage Pipeline** - Python FastAPI crawler, recursive chunker, FastEmbed embeddings, and tenant-isolated Qdrant vector storage.
 - [ ] **Phase 2: Semantic RAG & Streaming Generation** - Tenant-filtered Qdrant retrieval, grounded context assembly, Groq Llama 3.3 streaming, and verified source citations.
 - [ ] **Phase 3: Control Backend & Ingestion Job Queue** - Node.js Express server, MongoDB Atlas models, BullMQ Redis queue, domain whitelisting, and rate-limiting.
 - [ ] **Phase 4: Embeddable Chat Widget** - Standalone Vanilla JS Web Component with Shadow DOM encapsulation, typewriter streaming, and citation links.
@@ -30,9 +30,9 @@ SuperMemory AI transforms scattered company knowledge into an embeddable, privat
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: FastAPI service scaffolding, Qdrant client connection, and `company_memories` collection schema with indexed `workspace_id`.
-- [ ] 01-02: Web crawling pipeline (Playwright/Crawl4AI + BeautifulSoup4), sitemap traversal, boilerplate stripper, and markdown conversion.
-- [ ] 01-03: Recursive hierarchical text chunker with metadata injection, FastEmbed ONNX runner, and batch Qdrant point upsert API.
+- [x] 01-01: FastAPI service scaffolding, Qdrant client connection, and `company_memories` collection schema with indexed `workspace_id`.
+- [x] 01-02: Web crawling pipeline (Playwright/Crawl4AI + BeautifulSoup4), sitemap traversal, boilerplate stripper, and markdown conversion.
+- [x] 01-03: Recursive hierarchical text chunker with metadata injection, FastEmbed ONNX runner, and batch Qdrant point upsert API.
 
 ---
 
@@ -114,7 +114,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Ingestion & Vector Storage Pipeline | 0/3 | Ready to execute | - |
+| 1. Ingestion & Vector Storage Pipeline | 3/3 | Complete | 2026-10-29 |
 | 2. Semantic RAG & Streaming Generation | 0/2 | Not started | - |
 | 3. Control Backend & Ingestion Job Queue | 0/3 | Not started | - |
 | 4. Embeddable Chat Widget | 0/2 | Not started | - |
@@ -122,4 +122,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 ---
 *Roadmap updated: 2026-10-29*
-*Next step: `/gsd-execute-phase 1`*
+*Next step: `/gsd-plan-phase 2`*

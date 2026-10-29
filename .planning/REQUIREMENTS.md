@@ -14,21 +14,21 @@
 - [ ] **AUTH-04**: System validates that API queries reject any cross-tenant data requests.
 
 ### 2. Web Ingestion & Crawling Engine
-- [ ] **INGEST-01**: Crawler discovers and traverses URLs from a base website URL or sitemap up to configured depth limits (max depth 3, max 50 pages).
-- [ ] **INGEST-02**: Ingestion pipeline strips HTML boilerplates (navbars, footers, scripts, ads) using Trafilatura / BeautifulSoup4 and converts content into clean Markdown.
-- [ ] **INGEST-03**: Crawler handles dynamic JavaScript SPAs using Playwright/Crawl4AI headless rendering.
-- [ ] **INGEST-04**: Crawler computes and persists document-level SHA-256 hashes for deduplication.
+- [x] **INGEST-01**: Crawler discovers and traverses URLs from a base website URL or sitemap up to configured depth limits (max depth 3, max 50 pages).
+- [x] **INGEST-02**: Ingestion pipeline strips HTML boilerplates (navbars, footers, scripts, ads) using Trafilatura / BeautifulSoup4 and converts content into clean Markdown.
+- [x] **INGEST-03**: Crawler handles dynamic JavaScript SPAs using Playwright/Crawl4AI headless rendering.
+- [x] **INGEST-04**: Crawler computes and persists document-level SHA-256 hashes for deduplication.
 
 ### 3. Chunking & Embeddings Pipeline
-- [ ] **EMBED-01**: Chunker splits extracted Markdown using hierarchical recursive character splitting (target 500–800 tokens, 100-token overlap).
-- [ ] **EMBED-02**: Each chunk is prepended with contextual metadata (Document Title, Source URL, Heading Path).
-- [ ] **EMBED-03**: FastEmbed generates 384-dimensional dense vector embeddings locally using `bge-small-en-v1.5` with ONNX Runtime.
-- [ ] **EMBED-04**: Chunker computes unique chunk-level hashes for granular change detection.
+- [x] **EMBED-01**: Chunker splits extracted Markdown using hierarchical recursive character splitting (target 500–800 tokens, 100-token overlap).
+- [x] **EMBED-02**: Each chunk is prepended with contextual metadata (Document Title, Source URL, Heading Path).
+- [x] **EMBED-03**: FastEmbed generates 384-dimensional dense vector embeddings locally using `bge-small-en-v1.5` with ONNX Runtime.
+- [x] **EMBED-04**: Chunker computes unique chunk-level hashes for granular change detection.
 
 ### 4. Qdrant Vector Storage & Isolation
-- [ ] **VECT-01**: System initializes `company_memories` collection in Qdrant with Cosine distance and HNSW indexing.
-- [ ] **VECT-02**: Payload schema stores `workspace_id`, `source_id`, `document_id`, `chunk_id`, `source_url`, `title`, and `text`.
-- [ ] **VECT-03**: `workspace_id` is indexed as a keyword field in Qdrant; every vector query enforces a strict payload match filter.
+- [x] **VECT-01**: System initializes `company_memories` collection in Qdrant with Cosine distance and HNSW indexing.
+- [x] **VECT-02**: Payload schema stores `workspace_id`, `source_id`, `document_id`, `chunk_id`, `source_url`, `title`, and `text`.
+- [x] **VECT-03**: `workspace_id` is indexed as a keyword field in Qdrant; every vector query enforces a strict payload match filter.
 
 ### 5. RAG Retrieval & Groq LLM Generation
 - [ ] **RAG-01**: User query is embedded via FastEmbed and matched against Qdrant top-k (K=4–6) vectors with cosine similarity thresholding (>= 0.65).
@@ -94,17 +94,17 @@
 | AUTH-02 | Phase 3 | Pending |
 | AUTH-03 | Phase 3 | Pending |
 | AUTH-04 | Phase 3 | Pending |
-| INGEST-01 | Phase 1 | Pending |
-| INGEST-02 | Phase 1 | Pending |
-| INGEST-03 | Phase 1 | Pending |
-| INGEST-04 | Phase 1 | Pending |
-| EMBED-01 | Phase 1 | Pending |
-| EMBED-02 | Phase 1 | Pending |
-| EMBED-03 | Phase 1 | Pending |
-| EMBED-04 | Phase 1 | Pending |
-| VECT-01 | Phase 1 | Pending |
-| VECT-02 | Phase 1 | Pending |
-| VECT-03 | Phase 1 | Pending |
+| INGEST-01 | Phase 1 | Complete |
+| INGEST-02 | Phase 1 | Complete |
+| INGEST-03 | Phase 1 | Complete |
+| INGEST-04 | Phase 1 | Complete |
+| EMBED-01 | Phase 1 | Complete |
+| EMBED-02 | Phase 1 | Complete |
+| EMBED-03 | Phase 1 | Complete |
+| EMBED-04 | Phase 1 | Complete |
+| VECT-01 | Phase 1 | Complete |
+| VECT-02 | Phase 1 | Complete |
+| VECT-03 | Phase 1 | Complete |
 | RAG-01 | Phase 2 | Pending |
 | RAG-02 | Phase 2 | Pending |
 | RAG-03 | Phase 2 | Pending |
