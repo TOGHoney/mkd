@@ -19,9 +19,6 @@ export function AppLayout({
   const [currentTab, setCurrentTab] = useState(activeTab);
   const [embedModalOpen, setEmbedModalOpen] = useState(false);
 
-  // Merge views if passed
-  registerViews(views);
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-surface-950 flex items-center justify-center">
