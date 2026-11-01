@@ -78,6 +78,18 @@ export function SourcesView() {
     return unsubscribe;
   }, [activeJob?.job_id, loadSources]);
 
+  // Auto-refresh sources if any source is currently crawling or idle
+  useEffect(() => {
+    const hasPending = sources.some(s => s.status === 'crawling' || s.status === 'idle');
+    if (!hasPending) return;
+
+    const interval = setInterval(() => {
+      loadSources();
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [sources, loadSources]);
+
   const handleAddSource = async (formData) => {
     const res = await createSource(formData);
     if (res?.source) {
@@ -115,11 +127,15 @@ export function SourcesView() {
       s.url.toLowerCase().includes(searchQuery.toLowerCase());
     
     if (filterType === 'all') return matchesSearch;
+    if (filterType === 'completed') return matchesSearch && (s.status === 'completed' || s.status === 'indexed');
     return matchesSearch && s.status === filterType;
   });
 
-  const totalPages = sources.reduce((sum, s) => sum + (s.pages_indexed || 0), 0);
-  const totalChunks = sources.reduce((sum, s) => sum + (s.chunks_stored || (s.pages_indexed ? s.pages_indexed * 4 : 0)), 0);
+  const totalPages = sources.reduce((sum, s) => sum + (s.pages_indexed ?? s.pages_count ?? 0), 0);
+  const totalChunks = sources.reduce((sum, s) => {
+    const pages = s.pages_indexed ?? s.pages_count ?? 0;
+    return sum + (s.chunks_stored ?? s.chunks_count ?? (pages ? pages * 4 : 0));
+  }, 0);
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">

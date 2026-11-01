@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import re
 from typing import List, Dict, Any, Optional, AsyncGenerator
 from pydantic import BaseModel, Field
 
@@ -10,6 +11,27 @@ from app.services.search_service import get_search_service, ScoredChunk
 logger = logging.getLogger(__name__)
 
 _rag_service: Optional["RAGService"] = None
+
+PREAMBLE_REGEX = re.compile(
+    r'^\s*(?:Based on|According to|From)\s+(?:the|our|these)?\s*(?:[a-zA-Z]+\s+)*(?:documentation|docs|information|materials|context|sources|documents)\s*[,:]?\s*',
+    re.IGNORECASE
+)
+
+
+def strip_rag_preamble(text: str) -> str:
+    """
+    Strips formulaic LLM preamble phrases like 'Based on the provided documentation, '
+    so responses begin directly, naturally, and authoritatively.
+    """
+    cleaned = PREAMBLE_REGEX.sub('', text)
+    cleaned = cleaned.lstrip()
+    for i, ch in enumerate(cleaned):
+        if ch.isalpha():
+            cleaned = cleaned[:i] + ch.upper() + cleaned[i+1:]
+            break
+        elif ch not in ('*', '_', '`', '#', ' ', '\n', '\t'):
+            break
+    return cleaned
 
 
 class Citation(BaseModel):
@@ -37,15 +59,31 @@ class RAGResponse(BaseModel):
     model: str
 
 
-SYSTEM_PROMPT = """You are a helpful, accurate, and professional AI customer support assistant.
-Your duty is to answer the user's question STRICTLY and SOLELY based on the provided company documentation context below.
+SYSTEM_PROMPT = """You are a helpful, knowledgeable, and professional AI documentation and customer support assistant.
+Your knowledge comes directly from the indexed company documentation and knowledge base provided in the context below.
 
 CRITICAL INSTRUCTIONS:
-1. Grounding: Answer strictly using facts from the provided sources. Do not speculate, extrapolate, or assume facts not present in the context.
-2. Missing Information: If the context does not contain enough information to answer the question, state:
-   "I apologize, but based on the provided company materials, I do not have enough information to answer that question. Please reach out to customer support for further assistance."
-3. Citations: When sharing facts, mention the relevant documentation title or topic where the customer can read more.
-4. Tone & Style: Be concise, clear, and empathetic. Use clean Markdown (bullet points, bold highlights) for readability.
+1. Direct, Natural Openings (NO BOILERPLATE PREAMBLES):
+   - NEVER start answers with phrases like "Based on the provided information", "Based on the provided documentation", "According to the provided materials", "Based on the retrieved context", "From the sources provided", or similar filler.
+   - Jump directly and authoritatively into the answer as the company's expert documentation assistant.
+   - For example, instead of: "Based on the provided documentation, Git is an open-source version control system...", state directly: "Git is an open-source version control system...".
+   - Instead of: "Based on the provided documentation, here is how you can...", state directly: "Here is how you can...".
+
+2. Greetings & Pleasantries:
+   - If the user offers a greeting (e.g., "hi", "hello", "hey", "good morning"), warmly introduce yourself as the AI documentation assistant and invite them to ask questions.
+
+3. Overview & Knowledge Base Inquiries:
+   - If the user asks about "the knowledge repo", "the knowledge base", "this website", "what is this docs about", "what can you tell me", or asks for an overview of available topics, synthesize a clear, well-structured summary of the available documentation and resources directly without filler preambles.
+
+4. Grounded Q&A:
+   - For specific questions, answer accurately using the facts and instructions found in the provided sources. Use bullet points and bold highlights for readability.
+
+5. Genuinely Missing Information:
+   - Only when a user asks for specific factual details that are completely absent from the provided context (e.g., specific pricing numbers not in the text, unrelated personal questions, or external topics), politely explain:
+     "I do not have detailed information on that specific topic in our documentation. Please reach out to customer support for further assistance."
+
+6. Tone & Style:
+   - Be helpful, welcoming, concise, direct, and structured. Use clean Markdown formatting.
 """
 
 
@@ -155,10 +193,44 @@ class RAGService:
                     max_tokens=1024
                 )
 
+                buffer = ""
+                preamble_handled = False
+
                 async for chunk in stream:
                     delta = chunk.choices[0].delta.content or ""
-                    if delta:
-                        event_payload = json.dumps({"type": "token", "content": delta})
+                    if not delta:
+                        continue
+
+                    if not preamble_handled:
+                        buffer += delta
+                        is_possible_preamble = any(
+                            buffer.strip().lower().startswith(p)
+                            for p in ["based", "according", "from the", "from our"]
+                        )
+                        if is_possible_preamble:
+                            has_break = any(p in buffer for p in [",", ":", "\n"])
+                            if (has_break and len(buffer.split()) >= 5) or len(buffer) >= 70:
+                                cleaned = strip_rag_preamble(buffer)
+                                if cleaned:
+                                    event_payload = json.dumps({"type": "token", "content": cleaned, "token": cleaned})
+                                    yield f"data: {event_payload}\n\n"
+                                buffer = ""
+                                preamble_handled = True
+                        else:
+                            # Not a preamble: emit immediately without delay
+                            event_payload = json.dumps({"type": "token", "content": buffer, "token": buffer})
+                            yield f"data: {event_payload}\n\n"
+                            buffer = ""
+                            preamble_handled = True
+                    else:
+                        event_payload = json.dumps({"type": "token", "content": delta, "token": delta})
+                        yield f"data: {event_payload}\n\n"
+
+                # Flush any residual buffer on stream completion
+                if not preamble_handled and buffer:
+                    cleaned = strip_rag_preamble(buffer)
+                    if cleaned:
+                        event_payload = json.dumps({"type": "token", "content": cleaned, "token": cleaned})
                         yield f"data: {event_payload}\n\n"
 
             except Exception as e:
@@ -167,27 +239,38 @@ class RAGService:
                 yield f"data: {err_payload}\n\n"
         else:
             # Fallback simulator when running in local development without active GROQ_API_KEY
-            logger.info("GROQ_API_KEY not configured; streaming simulated grounded answer from context.")
-            if search_res.results:
+            query_clean = query.strip().lower().rstrip("?!.")
+            greetings = ["hi", "hello", "hey", "help", "who are you", "what is this", "hi there", "good morning", "good evening"]
+
+            if query_clean in greetings:
+                sample_tokens = (
+                    "Hello! I am your AI documentation assistant. I can help answer questions based on "
+                    "your company's knowledge base and documentation. Ask me anything!"
+                ).split(" ")
+            elif search_res.results:
                 top_hit = search_res.results[0]
                 sample_tokens = (
-                    f"Based on **{top_hit.title}** ({top_hit.source_url}), here is what our documentation states:\n\n"
+                    f"**{top_hit.title}**\n\n"
                     f"{top_hit.text[:300]}..."
                 ).split(" ")
             else:
                 sample_tokens = (
-                    "I apologize, but based on the provided company materials, I do not have sufficient "
-                    "information to answer that question. Please reach out to customer support."
+                    f"I searched your knowledge base for \"{query}\", but did not find matching materials yet. "
+                    "Please ensure your website or docs have been crawled in the dashboard, or contact customer support."
                 ).split(" ")
 
             for word in sample_tokens:
                 await asyncio.sleep(0.04)
-                token_payload = json.dumps({"type": "token", "content": word + " "})
+                token_payload = json.dumps({"type": "token", "content": word + " ", "token": word + " "})
                 yield f"data: {token_payload}\n\n"
 
         # 3. Stream citations payload
         citations_data = [c.model_dump() for c in citations]
-        citations_payload = json.dumps({"type": "citations", "sources": citations_data})
+        citations_payload = json.dumps({
+            "type": "citations",
+            "sources": citations_data,
+            "citations": [c.url for c in citations]
+        })
         yield f"data: {citations_payload}\n\n"
 
         # 4. Stream final termination marker
@@ -221,16 +304,17 @@ class RAGService:
                     temperature=temperature,
                     max_tokens=1024
                 )
-                answer_text = completion.choices[0].message.content or ""
+                raw_answer = completion.choices[0].message.content or ""
+                answer_text = strip_rag_preamble(raw_answer)
             except Exception as e:
                 logger.error(f"Groq API error: {e}")
                 answer_text = f"Error generating answer: {str(e)}"
         else:
             if search_res.results:
                 top_hit = search_res.results[0]
-                answer_text = f"Based on {top_hit.title} ({top_hit.source_url}):\n\n{top_hit.text[:300]}..."
+                answer_text = f"**{top_hit.title}**\n\n{top_hit.text[:300]}..."
             else:
-                answer_text = "I apologize, but based on the provided company materials, I do not have enough information."
+                answer_text = "I do not have detailed information on that specific topic in our documentation. Please reach out to customer support."
 
         return RAGResponse(
             answer=answer_text,

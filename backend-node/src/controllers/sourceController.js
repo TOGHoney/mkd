@@ -70,11 +70,18 @@ async function createSource(req, res) {
     return res.status(202).json({
       message: 'Source created and ingestion job enqueued',
       source: {
+        _id: source._id,
         id: source._id,
+        workspace_id: source.workspace_id,
         name: source.name,
         type: source.type,
         url: source.url,
-        status: source.status
+        status: source.status,
+        pages_count: 0,
+        pages_indexed: 0,
+        chunks_stored: 0,
+        chunks_count: 0,
+        createdAt: source.createdAt
       },
       job_id: jobId,
       status: 'queued'
@@ -90,7 +97,20 @@ async function createSource(req, res) {
  */
 async function getSources(req, res) {
   try {
-    const sources = await Source.find({ workspace_id: req.workspace._id }).sort({ createdAt: -1 });
+    const rawSources = await Source.find({ workspace_id: req.workspace._id }).sort({ createdAt: -1 });
+    const sources = rawSources.map(s => {
+      const doc = s.toObject ? s.toObject() : { ...s };
+      const pages = doc.pages_indexed ?? doc.pages_count ?? 0;
+      const chunks = doc.chunks_stored ?? doc.chunks_count ?? (pages > 0 ? pages * 4 : 0);
+      return {
+        ...doc,
+        _id: doc._id || doc.id,
+        pages_count: pages,
+        pages_indexed: pages,
+        chunks_stored: chunks,
+        chunks_count: chunks
+      };
+    });
     return res.status(200).json({ sources });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to retrieve sources' });

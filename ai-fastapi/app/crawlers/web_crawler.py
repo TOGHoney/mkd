@@ -56,7 +56,7 @@ class WebCrawler:
         self.errors: List[Dict[str, Any]] = []
 
         self.headers = {
-            "User-Agent": "SuperMemory-AI-Bot/1.0 (+https://supermemory.ai)",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 (compatible; SuperMemoryBot/1.0)",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
         }
@@ -175,8 +175,8 @@ class WebCrawler:
                     clean_res = clean_html_to_markdown(res.text, base_url=current_url)
                     markdown = clean_res["markdown"]
 
-                    # Only keep pages with meaningful text (>100 characters)
-                    if len(markdown) >= 100:
+                    # Only keep pages with meaningful text (>= 20 characters)
+                    if len(markdown.strip()) >= 20:
                         page = CrawlPage(
                             url=current_url,
                             title=clean_res["title"],

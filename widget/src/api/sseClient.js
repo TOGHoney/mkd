@@ -75,15 +75,17 @@ export async function streamWidgetChat({
             try {
               const parsed = JSON.parse(rawData);
 
-              if (parsed.token) {
-                fullAnswer += parsed.token;
+              const token = parsed.token || parsed.content || (parsed.type === 'token' ? parsed.content : null);
+              if (token) {
+                fullAnswer += token;
                 if (typeof onToken === 'function') {
-                  onToken(parsed.token, fullAnswer);
+                  onToken(token, fullAnswer);
                 }
               }
 
-              if (parsed.citations && Array.isArray(parsed.citations)) {
-                citations = parsed.citations;
+              const sources = parsed.citations || parsed.sources || (parsed.type === 'citations' ? parsed.sources : null);
+              if (sources && Array.isArray(sources)) {
+                citations = sources;
                 if (typeof onCitations === 'function') {
                   onCitations(citations);
                 }

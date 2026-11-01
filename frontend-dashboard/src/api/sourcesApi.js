@@ -1,4 +1,4 @@
-import client, { getStoredToken } from './client.js';
+import client, { getStoredToken, API_BASE_URL } from './client.js';
 
 // Default mock sources for offline / demo mode
 export const DEMO_SOURCES = [
@@ -124,7 +124,7 @@ export async function createSource({ name, url, type = 'website', max_pages = 50
     return {
       message: 'Source created and ingestion job enqueued (demo mode)',
       source: newSource,
-      job_id: `job_${Date.now()}`,
+      job_id: `job_demo_${Date.now()}`,
       status: 'queued'
     };
   }
@@ -148,7 +148,7 @@ export function subscribeJobProgress(jobId, { onProgress, onComplete, onError })
   if (!jobId) return () => {};
 
   // If in demo mode simulation
-  if (jobId.startsWith('job_')) {
+  if (jobId.startsWith('job_demo_')) {
     let pages = 0;
     const interval = setInterval(() => {
       pages += 5;
@@ -170,7 +170,7 @@ export function subscribeJobProgress(jobId, { onProgress, onComplete, onError })
   }
 
   // Real backend SSE connection
-  const sseUrl = `/api/v1/jobs/${jobId}/progress`;
+  const sseUrl = `${API_BASE_URL}/api/v1/jobs/${jobId}/progress`;
   const eventSource = new EventSource(sseUrl);
 
   eventSource.onmessage = (event) => {

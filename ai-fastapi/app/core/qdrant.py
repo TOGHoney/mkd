@@ -23,12 +23,25 @@ def get_qdrant_client() -> Optional[Any]:
         if QdrantClient is None:
             logger.warning("qdrant_client package not installed; client instance is None.")
             return None
-        logger.info(f"Connecting to Qdrant at {settings.QDRANT_URL}...")
-        _qdrant_client = QdrantClient(
-            url=settings.QDRANT_URL,
-            api_key=settings.QDRANT_API_KEY,
-            timeout=10.0
-        )
+        
+        # Check if remote Qdrant is reachable; otherwise fall back to local disk storage
+        try:
+            logger.info(f"Connecting to Qdrant at {settings.QDRANT_URL}...")
+            client = QdrantClient(
+                url=settings.QDRANT_URL,
+                api_key=settings.QDRANT_API_KEY,
+                timeout=1.5
+            )
+            client.get_collections()
+            _qdrant_client = client
+            logger.info("Connected to remote Qdrant server.")
+        except Exception as e:
+            logger.warning(
+                f"Remote Qdrant unavailable at {settings.QDRANT_URL} ({e}). "
+                "Operating in in-memory vector storage mode."
+            )
+            _qdrant_client = QdrantClient(":memory:")
+
     return _qdrant_client
 
 

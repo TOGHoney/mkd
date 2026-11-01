@@ -1,12 +1,15 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env'), override: true });
 const express = require('express');
 const cors = require('cors');
 const { connectDB, getDbStatus } = require('./config/db');
+const { startIngestionWorker } = require('./queues/ingestionWorker');
 const authRoutes = require('./routes/authRoutes');
 const workspaceRoutes = require('./routes/workspaceRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+// Default to 5000; never collide with port 8000 (FastAPI AI engine)
+const PORT = (process.env.PORT && process.env.PORT !== '8000') ? parseInt(process.env.PORT, 10) : 5000;
 
 // Core Middleware
 app.use(cors({
@@ -16,6 +19,9 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve compiled widget bundle for embed script testing
+app.use('/dist', express.static(path.join(__dirname, '../../widget/dist')));
 
 const sourceRoutes = require('./routes/sourceRoutes');
 const jobRoutes = require('./routes/jobRoutes');
@@ -63,6 +69,7 @@ app.use((err, req, res, next) => {
 // Auto-start server if executed directly
 if (require.main === module) {
   connectDB().then(() => {
+    startIngestionWorker();
     app.listen(PORT, () => {
       console.log(`[Server] SuperMemory control backend running on port ${PORT}`);
     });

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 const Conversation = require('../models/Conversation');
 
-const FASTAPI_URL = process.env.FASTAPI_URL || 'http://localhost:8000';
+const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
 
 /**
  * Public endpoint to retrieve widget styling and welcome configuration.
@@ -54,89 +54,96 @@ async function handleWidgetChat(req, res) {
   let fullAssistantText = '';
   let citations = [];
 
-  try {
-    // Proxy request to FastAPI RAG streaming query endpoint
-    const response = await axios.post(
-      `${FASTAPI_URL}/api/v1/rag/query`,
-      {
-        workspace_id: workspace._id.toString(),
-        query: message.trim()
-      },
-      {
-        responseType: 'stream',
-        timeout: process.env.NODE_ENV === 'test' ? 1000 : 30000
-      }
-    );
-
-    // Forward SSE stream directly to the client
-    response.data.on('data', (chunk) => {
-      const text = chunk.toString();
-      res.write(text);
-
-      // Parse text chunks for conversation persistence
-      const lines = text.split('\n');
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const payload = line.slice(6).trim();
-          if (payload === '[DONE]') continue;
-          try {
-            const parsed = JSON.parse(payload);
-            if (parsed.token) fullAssistantText += parsed.token;
-            if (parsed.citations && Array.isArray(parsed.citations)) {
-              citations = parsed.citations;
-            }
-          } catch (_) {}
+  return new Promise(async (resolve) => {
+    try {
+      // Proxy request to FastAPI RAG streaming query endpoint
+      const response = await axios.post(
+        `${FASTAPI_URL}/api/v1/rag/query`,
+        {
+          workspace_id: workspace._id.toString(),
+          query: message.trim()
+        },
+        {
+          responseType: 'stream',
+          timeout: process.env.NODE_ENV === 'test' ? 1000 : 30000
         }
-      }
-    });
+      );
 
-    response.data.on('end', async () => {
+      // Forward SSE stream directly to the client
+      response.data.on('data', (chunk) => {
+        const text = chunk.toString();
+        res.write(text);
+
+        // Parse text chunks for conversation persistence
+        const lines = text.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const payload = line.slice(6).trim();
+            if (payload === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(payload);
+              const token = parsed.token || parsed.content || (parsed.type === 'token' ? parsed.content : null);
+              if (token) fullAssistantText += token;
+              const src = parsed.citations || parsed.sources || (parsed.type === 'citations' ? parsed.sources : null);
+              if (src && Array.isArray(src)) {
+                citations = src;
+              }
+            } catch (_) {}
+          }
+        }
+      });
+
+      response.data.on('end', async () => {
+        const latencyMs = Date.now() - startTime;
+
+        // Asynchronously persist conversation in MongoDB
+        await saveConversationRecord({
+          sessionId,
+          workspaceId: workspace._id,
+          userIp: clientIp,
+          origin,
+          userMessage: message.trim(),
+          assistantText: fullAssistantText || 'Response completed.',
+          citations,
+          latencyMs
+        });
+
+        res.write('data: [DONE]\n\n');
+        res.end();
+        resolve();
+      });
+
+      response.data.on('error', (err) => {
+        console.warn(`[WidgetChat] Upstream stream notice: ${err.message}`);
+        res.write(`data: ${JSON.stringify({ token: " I'm ready to help answer questions based on this knowledge base." })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+        resolve();
+      });
+    } catch (err) {
+      // Resilient fallback for testing or when FastAPI is in mock/offline mode
+      console.warn(`[WidgetChat] FastAPI upstream unavailable (${err.message}). Streaming simulated answer.`);
+      const fallbackAnswer = `You can easily set up your account and customize your chat widget for ${workspace.name}.`;
+      const fallbackCitations = ['https://example.com/docs/getting-started'];
+
+      res.write(`data: ${JSON.stringify({ token: fallbackAnswer, citations: fallbackCitations })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+
       const latencyMs = Date.now() - startTime;
-
-      // Asynchronously persist conversation in MongoDB
       await saveConversationRecord({
         sessionId,
         workspaceId: workspace._id,
         userIp: clientIp,
         origin,
         userMessage: message.trim(),
-        assistantText: fullAssistantText || 'Response completed.',
-        citations,
+        assistantText: fallbackAnswer,
+        citations: fallbackCitations,
         latencyMs
       });
-
-      res.write('data: [DONE]\n\n');
-      res.end();
-    });
-
-    response.data.on('error', (err) => {
-      console.warn(`[WidgetChat] Upstream stream notice: ${err.message}`);
-      res.write(`data: ${JSON.stringify({ token: " I'm ready to help answer questions based on this knowledge base." })}\n\n`);
-      res.write('data: [DONE]\n\n');
-      res.end();
-    });
-  } catch (err) {
-    // Resilient fallback for testing or when FastAPI is in mock/offline mode
-    console.warn(`[WidgetChat] FastAPI upstream unavailable (${err.message}). Streaming simulated answer.`);
-    const fallbackAnswer = `Based on the documentation for ${workspace.name}, you can easily set up your account and customize your chat widget.`;
-    const fallbackCitations = ['https://example.com/docs/getting-started'];
-
-    res.write(`data: ${JSON.stringify({ token: fallbackAnswer, citations: fallbackCitations })}\n\n`);
-    res.write('data: [DONE]\n\n');
-    res.end();
-
-    const latencyMs = Date.now() - startTime;
-    await saveConversationRecord({
-      sessionId,
-      workspaceId: workspace._id,
-      userIp: clientIp,
-      origin,
-      userMessage: message.trim(),
-      assistantText: fallbackAnswer,
-      citations: fallbackCitations,
-      latencyMs
-    });
-  }
+      resolve();
+    }
+  });
 }
 
 async function saveConversationRecord({

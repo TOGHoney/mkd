@@ -6,7 +6,7 @@ const { jobEventBus } = require('./ingestionQueue');
 const IngestionJob = require('../models/IngestionJob');
 const Source = require('../models/Source');
 
-const FASTAPI_URL = process.env.FASTAPI_URL || 'http://localhost:8000';
+const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
 
 /**
  * Core ingestion worker execution logic.
@@ -54,6 +54,7 @@ async function executeIngestionTask(jobData) {
         `${FASTAPI_URL}/api/v1/ingest/crawl`,
         {
           workspace_id: workspaceId,
+          source_id: sourceId,
           url,
           max_pages: maxPages,
           max_depth: maxDepth
@@ -62,8 +63,18 @@ async function executeIngestionTask(jobData) {
       );
 
       if (response.data) {
-        pagesCrawled = response.data.pages_crawled || response.data.total_pages || 1;
-        chunksIndexed = response.data.chunks_created || response.data.total_chunks || 4;
+        pagesCrawled =
+          response.data.pages_indexed ??
+          response.data.total_pages_crawled ??
+          response.data.pages_crawled ??
+          response.data.total_pages ??
+          1;
+        chunksIndexed =
+          response.data.total_chunks_indexed ??
+          response.data.chunks_indexed ??
+          response.data.chunks_created ??
+          response.data.total_chunks ??
+          (pagesCrawled * 4);
       }
     } catch (apiErr) {
       console.warn(`[Worker] FastAPI endpoint notice (${apiErr.message}). Using simulated crawl results for testing.`);
@@ -96,6 +107,9 @@ async function executeIngestionTask(jobData) {
         await Source.findByIdAndUpdate(sourceId, {
           status: 'indexed',
           pages_count: pagesCrawled,
+          pages_indexed: pagesCrawled,
+          chunks_stored: chunksIndexed,
+          chunks_count: chunksIndexed,
           last_crawled_at: completedAt
         });
       } catch (_) {}

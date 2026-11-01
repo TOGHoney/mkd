@@ -41,6 +41,8 @@ export function setStoredWorkspaceId(id) {
   } catch {}
 }
 
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 /**
  * Perform authenticated API request.
  */
@@ -61,7 +63,8 @@ export async function apiRequest(endpoint, options = {}) {
     headers['x-workspace-id'] = workspaceId;
   }
 
-  const url = endpoint.startsWith('http') ? endpoint : `/api/v1${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  const path = `/api/v1${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${path}`;
 
   const response = await fetch(url, {
     ...options,

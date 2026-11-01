@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
 
-// Never buffer commands indefinitely when database is offline
-mongoose.set('bufferCommands', false);
-
 let isConnected = false;
 
 /**
@@ -16,7 +13,7 @@ async function connectDB() {
 
   try {
     const conn = await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 2000, // Quick failover for offline dev/tests
+      serverSelectionTimeoutMS: 8000,
     });
     isConnected = true;
     console.log(`[Database] MongoDB connected: ${conn.connection.host}`);

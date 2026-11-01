@@ -1,4 +1,12 @@
+import os
+from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
+
+# Resolve absolute path to ai-fastapi/.env
+ENV_PATH = Path(__file__).resolve().parent.parent.parent / ".env"
+if ENV_PATH.exists():
+    load_dotenv(dotenv_path=ENV_PATH, override=True)
 
 try:
     from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,7 +36,7 @@ class Settings(BaseSettings):
 
     # Groq LLM Settings (for Phase 2)
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_MODEL: str = "qwen/qwen3.8-27b"
 
     # Crawler Settings
     DEFAULT_CRAWL_MAX_DEPTH: int = 2
@@ -36,7 +44,7 @@ class Settings(BaseSettings):
     CRAWL_TIMEOUT_SECONDS: float = 15.0
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_PATH) if ENV_PATH.exists() else ".env",
         env_file_encoding="utf-8",
         extra="ignore"
     )

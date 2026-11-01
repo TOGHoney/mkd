@@ -36,6 +36,11 @@ export function SourceCard({ source, onDelete }) {
       badgeClass: 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30',
       icon: CheckCircle2
     },
+    indexed: {
+      label: 'Synced & Indexed',
+      badgeClass: 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30',
+      icon: CheckCircle2
+    },
     failed: {
       label: 'Crawl Failed',
       badgeClass: 'bg-rose-950/40 text-rose-400 border-rose-500/30',
@@ -45,6 +50,9 @@ export function SourceCard({ source, onDelete }) {
 
   const status = statusConfig[source.status] || statusConfig.idle;
   const StatusIcon = status.icon;
+
+  const pageCount = source.pages_indexed ?? source.pages_count ?? 0;
+  const chunkCount = source.chunks_stored ?? source.chunks_count ?? (pageCount > 0 ? pageCount * 4 : 0);
 
   const formatRelativeTime = (dateStr) => {
     if (!dateStr) return 'Never';
@@ -96,14 +104,14 @@ export function SourceCard({ source, onDelete }) {
         <div>
           <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Pages</span>
           <p className="text-xs font-semibold text-slate-200 mt-0.5">
-            {source.pages_indexed || 0} pages
+            {pageCount} pages
           </p>
         </div>
         <div>
           <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Vectors</span>
           <p className="text-xs font-semibold text-brand-400 mt-0.5 flex items-center gap-1">
             <Database className="w-3 h-3" />
-            <span>{source.chunks_stored || (source.pages_indexed ? source.pages_indexed * 4 : 0)} chunks</span>
+            <span>{chunkCount} chunks</span>
           </p>
         </div>
       </div>

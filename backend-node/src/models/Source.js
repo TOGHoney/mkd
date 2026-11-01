@@ -24,11 +24,23 @@ const sourceSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['idle', 'crawling', 'indexed', 'failed'],
+    enum: ['idle', 'crawling', 'indexed', 'completed', 'failed'],
     default: 'idle',
     index: true
   },
   pages_count: {
+    type: Number,
+    default: 0
+  },
+  pages_indexed: {
+    type: Number,
+    default: 0
+  },
+  chunks_stored: {
+    type: Number,
+    default: 0
+  },
+  chunks_count: {
     type: Number,
     default: 0
   },

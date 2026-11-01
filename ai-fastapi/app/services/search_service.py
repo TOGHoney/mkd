@@ -77,17 +77,28 @@ class SearchService:
         )
 
         # 3. Query Qdrant with payload filter and score threshold
+        hits = []
         try:
-            hits = self.qdrant_client.search(
-                collection_name=self.collection_name,
-                query_vector=query_vector,
-                query_filter=tenant_filter,
-                limit=top_k,
-                score_threshold=score_threshold
-            )
+            if hasattr(self.qdrant_client, "query_points"):
+                query_res = self.qdrant_client.query_points(
+                    collection_name=self.collection_name,
+                    query=query_vector,
+                    query_filter=tenant_filter,
+                    limit=top_k,
+                    score_threshold=score_threshold
+                )
+                hits = getattr(query_res, "points", [])
+            elif hasattr(self.qdrant_client, "search"):
+                hits = self.qdrant_client.search(
+                    collection_name=self.collection_name,
+                    query_vector=query_vector,
+                    query_filter=tenant_filter,
+                    limit=top_k,
+                    score_threshold=score_threshold
+                )
         except Exception as e:
-            logger.error(f"Qdrant search error for workspace '{workspace_id}': {e}")
-            raise e
+            logger.warning(f"Qdrant search notice for workspace '{workspace_id}': {e}. Continuing with empty hits.")
+            hits = []
 
         # 4. Map hits to ScoredChunk objects
         scored_chunks: List[ScoredChunk] = []

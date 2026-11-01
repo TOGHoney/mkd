@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Workspace = require('../models/Workspace');
 const { generateToken } = require('../middlewares/auth');
@@ -19,6 +20,12 @@ async function register(req, res) {
   }
 
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        error: 'Database is still connecting or unavailable. Please ensure your IP is whitelisted on MongoDB Atlas.'
+      });
+    }
+
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
       return res.status(409).json({ error: 'An account with this email already exists' });
@@ -84,6 +91,12 @@ async function login(req, res) {
   }
 
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        error: 'Database is still connecting or unavailable. Please ensure your IP is whitelisted on MongoDB Atlas.'
+      });
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });

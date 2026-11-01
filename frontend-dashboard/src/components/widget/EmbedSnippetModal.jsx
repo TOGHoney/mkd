@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { generateEmbedSnippet } from '../../api/widgetApi';
+import { API_BASE_URL } from '../../api/client';
 
 export function EmbedSnippetModal({ isOpen, onClose }) {
   const { activeWorkspace } = useWorkspace();
@@ -18,9 +19,10 @@ export function EmbedSnippetModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  const apiHost = API_BASE_URL || window.location.origin;
   const snippet = generateEmbedSnippet(
     activeWorkspace?.widget_key || 'wk_live_sample_key',
-    window.location.origin
+    apiHost
   );
 
   const handleCopy = () => {

@@ -62,6 +62,18 @@ export function WorkspaceOverview({ onOpenEmbedModal, onSelectTab }) {
     }
   }, [activeWorkspace]);
 
+  // Auto-refresh sources if any source is currently crawling or idle
+  useEffect(() => {
+    const hasPending = sources.some(s => s.status === 'crawling' || s.status === 'idle');
+    if (!hasPending) return;
+
+    const interval = setInterval(() => {
+      loadSources();
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [sources, loadSources]);
+
   const handleCopy = (text, type) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
@@ -125,8 +137,11 @@ export function WorkspaceOverview({ onOpenEmbedModal, onSelectTab }) {
 
   // Determine whether this is demo mode or a real user workspace
   const isDemo = getStoredToken() === 'demo_token_supermemory_2026';
-  const totalPages = sources.reduce((sum, s) => sum + (s.pages_indexed || 0), 0);
-  const totalChunks = sources.reduce((sum, s) => sum + (s.chunks_stored || 0), 0);
+  const totalPages = sources.reduce((sum, s) => sum + (s.pages_indexed ?? s.pages_count ?? 0), 0);
+  const totalChunks = sources.reduce((sum, s) => {
+    const pages = s.pages_indexed ?? s.pages_count ?? 0;
+    return sum + (s.chunks_stored ?? s.chunks_count ?? (pages ? pages * 4 : 0));
+  }, 0);
 
   const stats = isDemo
     ? (activeWorkspace?.stats || {
@@ -359,7 +374,7 @@ export function WorkspaceOverview({ onOpenEmbedModal, onSelectTab }) {
                   </a>
                 </div>
                 <span className="text-[10px] px-2.5 py-1 rounded-full bg-slate-800/90 text-brand-300 shrink-0 font-medium border border-slate-700">
-                  {s.pages_indexed || 0} pages
+                  {s.status === 'crawling' ? 'Crawling...' : `${s.pages_indexed ?? s.pages_count ?? 0} pages`}
                 </span>
               </div>
             ))}
