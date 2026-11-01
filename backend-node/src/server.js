@@ -21,6 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve compiled widget bundle for embed script testing
+app.use('/dist', express.static(path.join(__dirname, '../public/dist')));
 app.use('/dist', express.static(path.join(__dirname, '../../widget/dist')));
 
 const sourceRoutes = require('./routes/sourceRoutes');

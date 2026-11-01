@@ -8,6 +8,8 @@ __pycache__/
 *.pyo
 .pytest_cache/
 dist/
+!widget/dist/
+!backend-node/public/dist/
 *.log
 .agents/
 local_qdrant/
