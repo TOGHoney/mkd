@@ -51,7 +51,7 @@ class TestRAGService(unittest.TestCase):
         messages = service._assemble_messages(query, context_str, history)
 
         self.assertEqual(messages[0]["role"], "system")
-        self.assertIn("STRICTLY and SOLELY based on the provided company documentation", messages[0]["content"])
+        self.assertIn("AI documentation and customer support assistant", messages[0]["content"])
         self.assertIn(context_str, messages[-1]["content"])
         self.assertIn(query, messages[-1]["content"])
 

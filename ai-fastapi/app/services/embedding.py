@@ -19,11 +19,18 @@ class EmbeddingService:
         self._load_model()
 
     def _load_model(self):
-        """Loads FastEmbed ONNX model."""
+        """Loads FastEmbed ONNX model with optimized single-thread CPU constraints."""
         try:
+            import os
             from fastembed import TextEmbedding
-            logger.info(f"Loading FastEmbed model '{self.model_name}'...")
-            self._model = TextEmbedding(model_name=self.model_name)
+            cache_dir = os.getenv("FASTEMBED_CACHE_PATH", None)
+            threads = int(os.getenv("OMP_NUM_THREADS", "1"))
+            logger.info(f"Loading FastEmbed model '{self.model_name}' (threads={threads}, cache_dir={cache_dir})...")
+            self._model = TextEmbedding(
+                model_name=self.model_name,
+                cache_dir=cache_dir,
+                threads=threads
+            )
             logger.info(f"FastEmbed model '{self.model_name}' loaded successfully.")
         except Exception as e:
             logger.warning(
