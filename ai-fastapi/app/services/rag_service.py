@@ -190,7 +190,7 @@ class RAGService:
                     messages=messages,
                     stream=True,
                     temperature=temperature,
-                    max_tokens=1024
+                    max_tokens=settings.GROQ_MAX_TOKENS
                 )
 
                 buffer = ""
@@ -235,7 +235,15 @@ class RAGService:
 
             except Exception as e:
                 logger.error(f"Groq streaming error: {e}")
-                err_payload = json.dumps({"type": "error", "message": str(e)})
+                err_str = str(e)
+                if "429" in err_str or "rate_limit_exceeded" in err_str:
+                    clean_msg = (
+                        "Rate limit reached for the current AI model. Please wait a moment before trying again, "
+                        "or set GROQ_MODEL to 'llama-3.3-70b-versatile' in your Render environment variables."
+                    )
+                else:
+                    clean_msg = f"AI Generation error: {err_str}"
+                err_payload = json.dumps({"type": "error", "message": clean_msg})
                 yield f"data: {err_payload}\n\n"
         else:
             # Fallback simulator when running in local development without active GROQ_API_KEY
@@ -302,13 +310,20 @@ class RAGService:
                     messages=messages,
                     stream=False,
                     temperature=temperature,
-                    max_tokens=1024
+                    max_tokens=settings.GROQ_MAX_TOKENS
                 )
                 raw_answer = completion.choices[0].message.content or ""
                 answer_text = strip_rag_preamble(raw_answer)
             except Exception as e:
                 logger.error(f"Groq API error: {e}")
-                answer_text = f"Error generating answer: {str(e)}"
+                err_str = str(e)
+                if "429" in err_str or "rate_limit_exceeded" in err_str:
+                    answer_text = (
+                        "Rate limit reached for the current AI model. Please wait a moment before trying again, "
+                        "or set GROQ_MODEL to 'llama-3.3-70b-versatile' in your Render environment variables."
+                    )
+                else:
+                    answer_text = f"Error generating answer: {err_str}"
         else:
             if search_res.results:
                 top_hit = search_res.results[0]

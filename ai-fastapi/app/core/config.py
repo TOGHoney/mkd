@@ -33,10 +33,12 @@ class Settings(BaseSettings):
     # Embedding Model Settings
     EMBEDDING_MODEL_NAME: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_DIMENSION: int = 384
+    HF_TOKEN: Optional[str] = None  # Free Hugging Face token for serverless embeddings (<50MB RAM)
 
-    # Groq LLM Settings (for Phase 2)
+    # Groq LLM Settings
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: str = "qwen/qwen3.8-27b"
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_MAX_TOKENS: int = 768
 
     # Crawler Settings
     DEFAULT_CRAWL_MAX_DEPTH: int = 2
